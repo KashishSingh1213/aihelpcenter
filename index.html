@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-Enhanced FAQ Widget for smart company policy retrieval and automated answering using Gemini AI.">
+    <title>Smart Company AI FAQ Widget</title>
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <div class="logo-area">
+                    <div class="logo-icon"><i class="fa-solid fa-brain-circuit"></i></div>
+                    <h2>SmartFAQ</h2>
+                </div>
+                <button class="mobile-close-btn" id="mobileCloseBtn" aria-label="Close sidebar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <p class="nav-title">Policy Categories</p>
+                <ul class="nav-links">
+                    <li>
+                        <button class="nav-link active" data-category="all" id="btn-cat-all">
+                            <i class="fa-solid fa-file-invoice"></i>
+                            <span>All Policies</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link" data-category="hr" id="btn-cat-hr">
+                            <i class="fa-solid fa-user-tie"></i>
+                            <span>HR Policy</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link" data-category="leave" id="btn-cat-leave">
+                            <i class="fa-solid fa-calendar-minus"></i>
+                            <span>Leave Policy</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link" data-category="attendance" id="btn-cat-attendance">
+                            <i class="fa-solid fa-clock"></i>
+                            <span>Attendance</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link" data-category="wfh" id="btn-cat-wfh">
+                            <i class="fa-solid fa-house-laptop"></i>
+                            <span>WFH Policy</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-link" data-category="holidays" id="btn-cat-holidays">
+                            <i class="fa-solid fa-umbrella-beach"></i>
+                            <span>Company Holidays</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+                    <i class="fa-solid fa-moon theme-icon"></i>
+                    <span class="theme-text">Dark Mode</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard Area -->
+        <main class="app-main">
+            <!-- Top Header Bar -->
+            <header class="app-header">
+                <div class="header-left">
+                    <button class="hamburger-menu" id="hamburgerMenu" aria-label="Open sidebar">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="status-badge" id="aiStatusBadge">
+                        <span class="status-indicator local"></span>
+                        <span class="status-label" id="statusLabel">Offline Matching Mode</span>
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <button class="settings-btn" id="openSettingsBtn" title="AI Configuration">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>AI Settings</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Welcome Section -->
+                <section class="welcome-section" id="welcomeSection">
+                    <h1>Ask Your Company Policies</h1>
+                    <p>No need to read pages of manual PDFs. Type your question below, and our AI Assistant will find the answers instantly.</p>
+                </section>
+
+                <!-- Search Panel -->
+                <section class="search-panel">
+                    <div class="search-bar-wrapper">
+                        <i class="fa-solid fa-magnifying-glass search-icon-left"></i>
+                        <input type="text" id="searchInput" placeholder="e.g., How many casual leaves do I get in a year?" autocomplete="off">
+                        
+                        <button class="voice-btn" id="voiceSearchBtn" title="Search with Voice">
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+                        
+                        <button class="submit-btn" id="searchSubmitBtn" title="Send Question">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Voice Recording Indicator -->
+                    <div class="voice-indicator hidden" id="voiceIndicator">
+                        <div class="pulse-ring"></div>
+                        <i class="fa-solid fa-microphone"></i>
+                        <span id="voiceStatusText">Listening... Speak now</span>
+                    </div>
+
+                    <!-- Suggestion Chips -->
+                    <div class="suggestion-chips">
+                        <button class="chip" data-query="How many leaves do I get in a year?" id="chip-1">Leaves allowance?</button>
+                        <button class="chip" data-query="What is the work from home request process?" id="chip-2">WFH Policy?</button>
+                        <button class="chip" data-query="Is there a late arrival grace period?" id="chip-3">Late attendance grace period?</button>
+                        <button class="chip" data-query="What are the main company holidays for this year?" id="chip-4">Company Holidays?</button>
+                    </div>
+                </section>
+
+                <!-- Response Area -->
+                <section class="response-section hidden" id="responseSection">
+                    <div class="response-card">
+                        <div class="response-header">
+                            <div class="user-query-container">
+                                <span class="query-prefix">Question:</span>
+                                <span class="query-text" id="displayQueryText">What is the leave policy?</span>
+                            </div>
+                        </div>
+
+                        <!-- Main AI Output -->
+                        <div class="response-body">
+                            <!-- Skeleton loader -->
+                            <div class="skeleton-loader hidden" id="skeletonLoader">
+                                <div class="skeleton-line"></div>
+                                <div class="skeleton-line"></div>
+                                <div class="skeleton-line short"></div>
+                            </div>
+                            
+                            <div class="ai-response-container" id="aiResponseText">
+                                <!-- AI output gets streamed here -->
+                            </div>
+                        </div>
+
+                        <!-- Footer: Citations and Feedback -->
+                        <div class="response-footer">
+                            <div class="citation-area">
+                                <span><i class="fa-solid fa-circle-info"></i> References:</span>
+                                <div class="citation-badges" id="citationBadges">
+                                    <!-- Badges of referenced policies -->
+                                </div>
+                            </div>
+                            
+                            <div class="feedback-actions">
+                                <button class="feedback-btn" id="btn-thumbs-up" title="Helpful">
+                                    <i class="fa-regular fa-thumbs-up"></i>
+                                </button>
+                                <button class="feedback-btn" id="btn-thumbs-down" title="Not Helpful">
+                                    <i class="fa-regular fa-thumbs-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Browse Policies Section -->
+                <section class="browse-section">
+                    <div class="section-title-wrapper">
+                        <h2><i class="fa-solid fa-book-open"></i> Reference Policy Database</h2>
+                        <span class="subtitle">Search results will match sections below</span>
+                    </div>
+
+                    <div class="policy-grid" id="policyGrid">
+                        <!-- Policy cards generated dynamically by JS -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- API Settings Modal -->
+    <div class="modal-overlay hidden" id="settingsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-gears"></i> AI Model Configuration</h3>
+                <button class="modal-close" id="closeSettingsBtn" aria-label="Close modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="info-alert">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <p>Your API key is stored locally in your browser's <strong>localStorage</strong>. It is sent directly to Google APIs and never touches any external servers.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="geminiApiKey">Gemini API Key</label>
+                    <div class="input-password-wrapper">
+                        <input type="password" id="geminiApiKey" placeholder="AIzaSy..." autocomplete="off">
+                        <button class="toggle-password" id="togglePasswordBtn" type="button" aria-label="Toggle password visibility">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <span class="help-text">Leave blank to use the built-in offline matching engine (Mock AI).</span>
+                </div>
+
+                <div class="help-guide">
+                    <h4>How to get a free Gemini API Key?</h4>
+                    <ol>
+                        <li>Go to <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">Google AI Studio <i class="fa-solid fa-up-right-from-square"></i></a>.</li>
+                        <li>Log in with your Google account.</li>
+                        <li>Click <strong>"Get API key"</strong> and create a new key.</li>
+                        <li>Paste it here to experience real generative responses!</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="clearApiBtn">Clear Key</button>
+                <button class="modal-btn primary" id="saveApiBtn">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast hidden" id="feedbackToast">
+        <i class="fa-solid fa-circle-check toast-icon"></i>
+        <span class="toast-message" id="toastMessage">Feedback recorded. Thank you!</span>
+    </div>
+
+    <!-- Script -->
+    <script src="app.js"></script>
+</body>
+</html>
